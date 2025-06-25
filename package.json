@@ -1,36 +1,46 @@
 {
-    "name": "atomhooks",
-    "version": "1.0.1",
-    "description": "A collection of custom React hooks for advanced state and ref management, including useStateRef.",
-    "main": "dist/useStateRef.js",
-    "types": "dist/useStateRef.d.ts",
-    "files": [
-        "dist"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Mahmadabid/atomhooks.git"
-    },
-    "keywords": [
-        "react",
-        "hook",
-        "useState",
-        "useRef",
-        "state",
-        "ref",
-        "custom hooks",
-        "atomhooks"
-    ],
-    "author": "",
-    "license": "MIT",
-    "peerDependencies": {
-        "react": ">=17.0.0"
-    },
-    "scripts": {
-        "build": "tsc"
-    },
-    "devDependencies": {
-        "typescript": "^5.0.0",
-        "@types/react": "^17.0.0"
+  "name": "atomhooks",
+  "version": "1.0.0",
+  "description": "A collection of custom React hooks for advanced state and ref management, including useStateRef.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mahmadabid/atomhooks.git"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "custom-hooks",
+    "useStateRef",
+    "useRef",
+    "useState",
+    "typescript",
+    "state",
+    "ref",
+    "atomhooks"
+  ],
+  "author": "Mahmad Abid",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=17.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^17.0.0"
+  }
 }

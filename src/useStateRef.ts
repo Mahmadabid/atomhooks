@@ -17,4 +17,4 @@ const useStateRef = <T>(initialValue: T): [T, (value: SetStateRefAction<T>) => v
   return [state, setStateRef, getCurrent];
 };
 
-export default useStateRef;
+export { useStateRef };

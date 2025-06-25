@@ -17,7 +17,7 @@ npm install atomhooks
 ## ⚡ Quick Usage
 
 ```js
-import useStateRef from 'atomhooks';
+import { useStateRef } from 'atomhooks';
 
 const [state, setState, getCurrent] = useStateRef(0);
 ```
@@ -28,7 +28,7 @@ const [state, setState, getCurrent] = useStateRef(0);
 
 ```jsx
 import React from 'react';
-import useStateRef from 'atomhooks';
+import { useStateRef } from 'atomhooks';
 
 function Counter() {
   const [count, setCount, getCount] = useStateRef(0);
