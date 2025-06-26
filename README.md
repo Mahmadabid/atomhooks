@@ -316,6 +316,40 @@ function SettingsFormTSX() {
 
 ---
 
+#### More Details & Tips
+
+
+**About & Tips**
+
+- `useDraftLocalStorage` is built on top of `useLocalStorage`.
+- Use it when you want users to edit a value (like a form or note) and only save changes when they explicitly click save.
+- Unlike `useLocalStorage`, which saves every change instantly, `useDraftLocalStorage` keeps edits in memory until you call `save()`.
+- Works well for settings forms, wizards, or any scenario where you want to prevent accidental saves.
+- Handles objects/arrays (uses JSON under the hood). Avoid non-serializable values (like functions, Dates, Maps).
+- Use the `hasChanges` flag to warn users about unsaved changes before navigating away.
+
+**Example: Prompt on Unsaved Changes**
+
+```jsx
+import { useDraftLocalStorage } from 'atomhooks';
+import { useEffect } from 'react';
+
+function MyForm() {
+  const { hasChanges } = useDraftLocalStorage('myform', {});
+  useEffect(() => {
+    const handler = (e) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasChanges]);
+  // ...existing code...
+}
+```
+
 ### useIsOnline
 
 **A React hook to detect if the browser is online or offline.**

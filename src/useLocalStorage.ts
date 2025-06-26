@@ -6,16 +6,16 @@ import { useState, useEffect } from 'react';
 export function useLocalStorage<T>(key: string, defaultValue: T) {
   const [value, setValue] = useState<T>(() => {
     if (typeof window === 'undefined') return defaultValue;
-    
+
     try {
       const item = localStorage.getItem(key);
       if (!item) return defaultValue;
-      
+
       // For string values, store them as raw strings without JSON serialization
       if (typeof defaultValue === 'string') {
         return item as T;
       }
-      
+
       // For other types, use JSON parsing
       try {
         return JSON.parse(item);
@@ -29,13 +29,13 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
   const setStoredValue = (newValue: T | ((prev: T) => T)) => {
     const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
     setValue(valueToStore);
-    
+
     if (typeof window !== 'undefined') {
       // For string values, store them as raw strings without JSON serialization
-      const storageValue = typeof valueToStore === 'string' 
+      const storageValue = typeof valueToStore === 'string'
         ? valueToStore as string
         : JSON.stringify(valueToStore);
-        
+
       localStorage.setItem(key, storageValue);
       // Trigger storage event for cross-component sync
       window.dispatchEvent(new StorageEvent('storage', {
@@ -63,13 +63,14 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
 
   // Listen for changes from other components
   useEffect(() => {
-    if (typeof window === 'undefined') return;    const handleStorageChange = (e: StorageEvent) => {
+    if (typeof window === 'undefined') return;
+    const handleStorageChange = (e: StorageEvent) => {
       if (e.key === key && e.storageArea === localStorage) {
         if (!e.newValue) {
           setValue(defaultValue);
           return;
         }
-        
+
         try {
           // For string values, use them directly without JSON parsing
           if (typeof defaultValue === 'string') {
