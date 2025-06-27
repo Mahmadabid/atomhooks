@@ -7,6 +7,7 @@ Built with TypeScript. Fully typed. Compatible with React 17+.
 
 ---
 
+
 ## 📚 Table of Contents
 
 - [Install](#-install)
@@ -15,6 +16,8 @@ Built with TypeScript. Fully typed. Compatible with React 17+.
   - [useLocalStorage](#uselocalstorage)
   - [useDraftLocalStorage](#usedraftlocalstorage)
   - [useIsOnline](#useisonline)
+- [Utilities](#-utilities)
+  - [getLocalStorage](#getlocalstorage--setlocalstorage)
 - [License](#-license)
 
 ---
@@ -395,6 +398,87 @@ function OnlineStatusTSX() {
 - Returns `true` if the browser is online, `false` if offline
 
 ---
+
+
+## 🛠️ Utilities
+
+### `getLocalStorage` & `setLocalStorage`
+
+Direct utility functions for reading and writing localStorage outside React components.
+
+#### Why use these utilities?
+
+While `useLocalStorage` is perfect for React components that need reactive state, sometimes you need to access localStorage in non-React contexts like:
+
+- Utility functions
+- Event handlers outside components
+- API calls or middleware
+- Before component initialization
+- Inside loops or async operations
+
+The utilities provide the same serialization logic and cross-component synchronization as the hook.
+
+#### Quick Usage
+
+```js
+import { getLocalStorage, setLocalStorage } from 'atomhooks';
+
+// Read a value
+const theme = getLocalStorage('theme', 'light');
+
+// Write a value
+setLocalStorage('theme', 'dark');
+```
+
+#### Example: Utility Functions in Loops
+
+```tsx
+import { getLocalStorage, setLocalStorage } from 'atomhooks';
+
+// Reading multiple preferences
+function loadUserPreferences() {
+  const preferences = {};
+  const keys = ['theme', 'language', 'fontSize', 'notifications'];
+  
+  for (const key of keys) {
+    preferences[key] = getLocalStorage(key, null);
+  }
+  
+  return preferences;
+}
+
+// Bulk saving settings
+function saveUserSettings(settings) {
+  for (const [key, value] of Object.entries(settings)) {
+    setLocalStorage(`user_${key}`, value);
+  }
+}
+```
+
+### API
+
+#### `getLocalStorage(key, defaultValue?)`
+
+- `key`: localStorage key to read
+- `defaultValue`: Value to return if key doesn't exist or on error
+- **Returns:** The stored value or defaultValue
+- **No rerenders:** Just reads the value
+
+#### `setLocalStorage(key, value)`
+
+- `key`: localStorage key to write
+- `value`: Value to store (strings stored as-is, objects JSON-serialized)
+- **Triggers rerenders:** Components using `useLocalStorage` with the same key will rerender
+- **Cross-component sync:** All hooked components stay synchronized
+
+#### Important Notes
+
+- **Rerender behavior:** `setLocalStorage` will cause components using `useLocalStorage` with the same key to rerender
+- **No rerender behavior:** `getLocalStorage` never causes rerenders
+- **Type safety:** Both functions are fully typed with TypeScript generics
+- **Consistent logic:** Uses the same serialization/deserialization as the hook
+- **Error handling:** Gracefully handles localStorage access errors and malformed JSON
+- **Why they were created:** Because sometimes you need to read and write localstorage of dynamic key, especially using openai tools.
 
 ## 📄 License
 

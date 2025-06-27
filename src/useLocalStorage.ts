@@ -91,3 +91,52 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
 
   return [value, setStoredValue, remove] as const;
 }
+
+/**
+ * Utility functions for direct localStorage access
+ */
+export function getLocalStorage<T>(key: string, defaultValue?: T): T | null {
+  if (typeof window === 'undefined') return defaultValue ?? null;
+
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return defaultValue ?? null;
+
+    // If defaultValue is a string, return the raw item
+    if (typeof defaultValue === 'string') {
+      return item as T;
+    }
+
+    // For other types, try JSON parsing
+    try {
+      return JSON.parse(item);
+    } catch {
+      return defaultValue ?? null;
+    }
+  } catch {
+    return defaultValue ?? null;
+  }
+}
+
+export function setLocalStorage<T>(key: string, value: T): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    // For string values, store them as raw strings
+    const storageValue = typeof value === 'string'
+      ? value as string
+      : JSON.stringify(value);
+
+    localStorage.setItem(key, storageValue);
+    
+    // Trigger storage event for cross-component sync
+    window.dispatchEvent(new StorageEvent('storage', {
+      key,
+      newValue: storageValue,
+      oldValue: localStorage.getItem(key),
+      storageArea: localStorage
+    }));
+  } catch (error) {
+    console.error('Failed to set localStorage:', error);
+  }
+}
