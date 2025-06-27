@@ -95,27 +95,49 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
 /**
  * Utility functions for direct localStorage access
  */
-export function getLocalStorage<T>(key: string, defaultValue?: T): T | null {
-  if (typeof window === 'undefined') return defaultValue ?? null;
+export function getLocalStorage<T>(
+  key: string, 
+  defaultValue?: T,
+  configs?: Array<{ key: string; defaultValue: unknown }>
+): { value: T | null; isNull: boolean } {
+  if (typeof window === 'undefined') {
+    const fallback = defaultValue ?? getDefaultFromConfigs(key, configs) ?? null;
+    return { value: fallback, isNull: true };
+  }
 
   try {
     const item = localStorage.getItem(key);
-    if (!item) return defaultValue ?? null;
+    const isNull = item === null;
+    
+    if (isNull) {
+      const fallback = defaultValue ?? getDefaultFromConfigs(key, configs) ?? null;
+      return { value: fallback, isNull: true };
+    }
 
     // If defaultValue is a string, return the raw item
     if (typeof defaultValue === 'string') {
-      return item as T;
+      return { value: item as T, isNull: false };
     }
 
     // For other types, try JSON parsing
     try {
-      return JSON.parse(item);
+      const parsed = JSON.parse(item);
+      return { value: parsed, isNull: false };
     } catch {
-      return defaultValue ?? null;
+      const fallback = defaultValue ?? getDefaultFromConfigs(key, configs) ?? null;
+      return { value: fallback, isNull: true };
     }
   } catch {
-    return defaultValue ?? null;
+    const fallback = defaultValue ?? getDefaultFromConfigs(key, configs) ?? null;
+    return { value: fallback, isNull: true };
   }
+}
+
+// Helper function to get default value from configs array
+function getDefaultFromConfigs<T>(key: string, configs?: Array<{ key: string; defaultValue: unknown }>): T | null {
+  if (!configs) return null;
+  const config = configs.find(config => config.key === key);
+  return config ? config.defaultValue as T : null;
 }
 
 export function setLocalStorage<T>(key: string, value: T): void {
@@ -128,7 +150,7 @@ export function setLocalStorage<T>(key: string, value: T): void {
       : JSON.stringify(value);
 
     localStorage.setItem(key, storageValue);
-    
+
     // Trigger storage event for cross-component sync
     window.dispatchEvent(new StorageEvent('storage', {
       key,

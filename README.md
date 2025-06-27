@@ -420,11 +420,22 @@ The utilities provide the same serialization logic and cross-component synchroni
 
 #### Quick Usage
 
+
 ```js
 import { getLocalStorage, setLocalStorage } from 'atomhooks';
 
-// Read a value
-const theme = getLocalStorage('theme', 'light');
+
+// Read a value (defaultValue and configs are both optional)
+const { value: theme, isNull } = getLocalStorage('theme');
+const { value: fontSize } = getLocalStorage('fontSize', 16); // with default fallback
+
+// Example with configs array (for fallback defaults by key)
+const configs = [
+  { key: 'theme', defaultValue: 'light' },
+  { key: 'language', defaultValue: 'en' },
+  { key: 'fontSize', defaultValue: 16 }
+];
+const { value: lang } = getLocalStorage('language', undefined, configs); // will fallback to 'en' if not set
 
 // Write a value
 setLocalStorage('theme', 'dark');
@@ -441,7 +452,15 @@ function loadUserPreferences() {
   const keys = ['theme', 'language', 'fontSize', 'notifications'];
   
   for (const key of keys) {
-    preferences[key] = getLocalStorage(key, null);
+    // Optionally pass a configs array for fallback defaults
+    const configs = [
+      { key: 'theme', defaultValue: 'light' },
+      { key: 'language', defaultValue: 'en' },
+      { key: 'fontSize', defaultValue: 16 },
+      { key: 'notifications', defaultValue: true }
+    ];
+    const { value } = getLocalStorage(key, null, configs);
+    preferences[key] = value;
   }
   
   return preferences;
@@ -457,12 +476,17 @@ function saveUserSettings(settings) {
 
 ### API
 
-#### `getLocalStorage(key, defaultValue?)`
+
+#### `getLocalStorage(key, defaultValue?, configs?)`
 
 - `key`: localStorage key to read
 - `defaultValue`: Value to return if key doesn't exist or on error
-- **Returns:** The stored value or defaultValue
+- `configs`: (optional) Array of `{ key, defaultValue }` objects for fallback defaults by key
+- **Returns:** `{ value, isNull }` object:
+  - `value`: The stored value, or `defaultValue`, or fallback from `configs`, or `null`
+  - `isNull`: Boolean, true if the key was not found or value could not be parsed
 - **No rerenders:** Just reads the value
+
 
 #### `setLocalStorage(key, value)`
 
@@ -478,6 +502,7 @@ function saveUserSettings(settings) {
 - **Type safety:** Both functions are fully typed with TypeScript generics
 - **Consistent logic:** Uses the same serialization/deserialization as the hook
 - **Error handling:** Gracefully handles localStorage access errors and malformed JSON
+- **Return shape:** `getLocalStorage` always returns an object `{ value, isNull }` for clarity and null-safety
 - **Why they were created:** Because sometimes you need to read and write localstorage of dynamic key, especially using openai tools.
 
 ## 📄 License
