@@ -1,6 +1,6 @@
 {
   "name": "atomhooks",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A collection of custom React hooks for advanced state and ref management, including useStateRef.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
